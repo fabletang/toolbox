@@ -5,14 +5,14 @@ import java.util.List;
 
 /**
  * author: fable tang
- * Comments: SposTLV spos转有TLV对象，增加 大类/函数 string,用于归类
+ * Comments: byte <-> TLV对象 转换
  * Create Date：2014-08-18
  * Modified By：
  * Modified Date:
  * JDK version used: 1.7
  * version: 0.9
  */
-public class SposTLV {
+public class TLV {
     private String clazz;
     private String func;
     private String para;
@@ -25,17 +25,17 @@ public class SposTLV {
     private String dataType;
 
     private int fatherTag;
-    private List<SposTLV> subTLVs;
+    private List<TLV> subTLVs;
 
-    public SposTLV() {
+    public TLV() {
     }
 
-    public SposTLV(int tag, int length, byte[] value ) {
+    public TLV(int tag, int length, byte[] value) {
         this.tag = tag;
         this.length = length;
         this.value = value;
     }
-    public SposTLV(String clazz, String func, String para, boolean isArray, boolean isConstructed, int tag, int length, byte[] value, String dataType, int fatherTag, List<SposTLV> subTLVs) {
+    public TLV(String clazz, String func, String para, boolean isArray, boolean isConstructed, int tag, int length, byte[] value, String dataType, int fatherTag, List<TLV> subTLVs) {
         this.clazz = clazz;
         this.func = func;
         this.para = para;
@@ -49,11 +49,11 @@ public class SposTLV {
         this.subTLVs = subTLVs;
     }
 
-    public List<SposTLV> getSubTLVs() {
+    public List<TLV> getSubTLVs() {
         return subTLVs;
     }
 
-    public void setSubTLVs(List<SposTLV> subTLVs) {
+    public void setSubTLVs(List<TLV> subTLVs) {
         this.subTLVs = subTLVs;
     }
 
@@ -138,14 +138,14 @@ public class SposTLV {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SposTLV)) return false;
+        if (!(o instanceof TLV)) return false;
 
-        SposTLV sposTLV = (SposTLV) o;
+        TLV TLV = (TLV) o;
 
-        if (length != sposTLV.length) return false;
-        if (tag != sposTLV.tag) return false;
-        if (subTLVs != null ? !subTLVs.equals(sposTLV.subTLVs) : sposTLV.subTLVs != null) return false;
-        if (!Arrays.equals(value, sposTLV.value)) return false;
+        if (length != TLV.length) return false;
+        if (tag != TLV.tag) return false;
+        if (subTLVs != null ? !subTLVs.equals(TLV.subTLVs) : TLV.subTLVs != null) return false;
+        if (!Arrays.equals(value, TLV.value)) return false;
 
         return true;
     }

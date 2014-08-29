@@ -11,26 +11,7 @@ import java.util.*;
  * JDK version used: 1.7
  * version: 0.9
  */
-public class SposTLVUtils {
-//    /**
-//     * 复制 原始TLV对象到 SposTLV
-//     *
-//     * @param tlv 原始TLV对象
-//     * @return SposTLV
-//     */
-//    public static SposTLV copyFromTLV(TLV tlv) {
-//        if (tlv == null) return null;
-//        SposTLV sposTLV = new SposTLV();
-//
-//        sposTLV.setConstructed(tlv.isConstructed());
-//        sposTLV.setTag(tlv.getTag());
-//        sposTLV.setLength(tlv.getLength());
-//        sposTLV.setValue(tlv.getValue());
-//        sposTLV.setDataType(tlv.getDataType());
-//
-//        return sposTLV;
-//    }
-
+public class TLVUtils {
     /**
      * 判断 tag 8bit byte 是否复合结构
      * <p/>
@@ -69,13 +50,13 @@ public class SposTLVUtils {
 
     /**
      * 判断 tag int 是否spos规范
-     * tag>0xC1010101 && tag<0xEFFFFFFF 为合法
+     * tag>0xC1000000 && tag<0xEFFFFFFF 为合法
      *
      * @param tag int32
      * @return boolean 默认为false
      */
     public static boolean justSpos(int tag) {
-        return (tag > 0xC1010101 && tag < 0xEFFFFFFF);
+        return (tag > 0xC1000000 && tag < 0xEFFFFFFF);
     }
 
     /**
@@ -110,66 +91,6 @@ public class SposTLVUtils {
         return justArray(isArray4bit);
     }
 
-    private static String justClazz(byte bit8) {
-        //byteTag[0] 低四位 process
-        byte clazz4bit = (byte) ((bit8 & 0x0F));
-        switch (clazz4bit) {
-            //todo 规则待定
-            case ((byte) (0x1)): { return ("PED"); }
-            case ((byte) (0x2)): { return ("CARD"); }
-            case ((byte) (0x3)): { return ("PRINT"); }
-            case ((byte) (0x4)): { return ("SYSTEM"); }
-            case ((byte) (0x5)): { return ("EMV"); }
-            default: return null;
-        }
-    }
-    public static String justClazz(int tag) {
-        if (!justSpos(tag)){return null;}
-        //byteTag[0] 低四位 process
-        byte[] byteTag = ByteStringHex.int2Bytes(tag);
-        return (justClazz(byteTag[0]));
-    }
-    private static String justFunc(byte bit8) {
-        //byteTag[1] 八位 process
-        switch (bit8) {
-            //todo 规则待定
-            case ((byte) (0x01)): { return ("GetVer"); }
-            case ((byte) (0x02)): { return ("GetModel"); }
-            default:return null;
-        }
-    }
-
-    public static String justFunc(int tag) {
-        if (!justSpos(tag)){return null;}
-        //byteTag[1] 八位 process
-        byte[] byteTag = ByteStringHex.int2Bytes(tag);
-        return (justFunc(byteTag[1]));
-    }
-
-    /**
-     * 参数变动较大，暂时不处理
-     * @param bit8
-     * @return
-     */
-    private static String justPara(byte bit8) {
-        return null;
-        //byteTag[2] 八位 process
-//        switch (bit8) {
-            //todo 规则待定
-//            case ((byte) (0x01)): {
-//                return ("pszSN");
-//            }
-//            case ((byte) (0x02)): {
-//                return ("pszKey");
-//            }
-//            default:return null;
-//        }
-    }
-    public static String justPara(int tag) {
-        if (!justSpos(tag)){return null;}
-        byte[] byteTag = ByteStringHex.int2Bytes(tag);
-        return (justPara(byteTag[2]));
-    }
     private static String justDataType(byte bit8) {
         //byteTag[3] 低四位 process
         byte dataType4Lo = (byte) ((bit8 & 0x0F));
@@ -191,11 +112,15 @@ public class SposTLVUtils {
             case ((byte) (0x5)): {
                 return ("Z");
             }
-            default:return null;
+            default:
+                return null;
         }
     }
+
     public static String justDataType(int tag) {
-        if (!justSpos(tag)){return null;}
+        if (!justSpos(tag)) {
+            return null;
+        }
         byte[] byteTag = ByteStringHex.int2Bytes(tag);
         return (justDataType(byteTag[3]));
     }
@@ -203,11 +128,11 @@ public class SposTLVUtils {
     /**
      * 根据tag进行处理，对应到 clazz/func/para, 具体请参考 sposTLV规则
      *
-     * @param tag     int 4byte
-     * @param sposTLV 待处理的sposTLV对象
+     * @param tag int 4byte
+     * @param tlv 待处理的sposTLV对象
      * @return SposTLV
      */
-    public static SposTLV processTag(int tag, SposTLV sposTLV) {
+    public static TLV processTag(int tag, TLV tlv) {
         if (!justSpos(tag)) {
             return null;
         }
@@ -215,20 +140,18 @@ public class SposTLVUtils {
         //根据规则 tag 第一个byte的 b8-b5 只有 0xE 0xC两种情况
         //byte isConstructed4bit=(byte)(byteTag[0]|0xF0);
         // 取高四位
-        sposTLV.setConstructed(justConstructed(byteTag[0]));
+        tlv.setConstructed(justConstructed(byteTag[0]));
         //byteTag[0] 低四位 process
-        sposTLV.setClazz(justClazz(byteTag[0]));
-        //byteTag[1] 八位 process
-        sposTLV.setFunc(justFunc(byteTag[1]));
-        //byteTag[2] 八位 process
-        sposTLV.setPara(justPara(byteTag[2]));
+
         //byteTag[3] 高4位 process
-        sposTLV.setArray(justArray(byteTag[3]));
+        tlv.setArray(justArray(byteTag[3]));
         //byteTag[3] 低四位 process
         //0x02 表示N(BCD), 0x03 表示B(HEX), 0x04  表示
         //GBK(汉字编码),0x05 表示Z(BCD扩展 字母/=,备用)
-        sposTLV.setDataType(justDataType(byteTag[3]));
-        return sposTLV;
+        tlv.setDataType(justDataType(byteTag[3]));
+        // 调用 sortutils 处理
+        tlv = SortUtils.SortTag(tag, tlv);
+        return tlv;
     }
 
     /**
@@ -238,7 +161,7 @@ public class SposTLVUtils {
      * @param bytesLen 指定长度 ，bytesLen<=bytes.length
      * @return
      */
-    public static List<SposTLV> bytes2SposTLVs(byte[] bytes, int bytesLen) {
+    public static List<TLV> bytes2SposTLVs(byte[] bytes, int bytesLen) {
         // 长度校验
         if (bytes == null || bytesLen <= 0 || bytesLen > bytes.length) {
             return null;
@@ -263,11 +186,11 @@ public class SposTLVUtils {
         int tag;
         int len;
         int lenBytes;// length 对应的bytes2Int
-        List<SposTLV> items = new ArrayList<SposTLV>();
+        List<TLV> items = new ArrayList<TLV>();
 
         for (int i = start; i < bytesLen; ) {
             // parse tag
-            SposTLV tlv = new SposTLV();
+            TLV tlv = new TLV();
             byte[] tagBytes = new byte[4];
             System.arraycopy(bytes, start, tagBytes, 0, 4);
             tag = ByteStringHex.bytes2Int(tagBytes);
@@ -285,7 +208,7 @@ public class SposTLVUtils {
                 len = bytes[i];
                 i += 1;
             }
-            if(justSpos(tag)) {
+            if (justSpos(tag)) {
                 byte[] value = new byte[len];
                 System.arraycopy(bytes, i, value, 0, len);
                 tlv.setTag(tag);
@@ -293,54 +216,41 @@ public class SposTLVUtils {
                 tlv.setValue(value);
                 // process sposTLV
                 tlv = processTag(tag, tlv);
-                if(tlv!=null) {
+                if (tlv != null) {
                     items.add(tlv);
                 }
             }
         }
         return items;
     }
-//    private static List<SposTLV> parseSposTLV2(SposTLV sposTLV) {
-//        if (!sposTLV.isConstructed()){
-//          return null;
-//        }
-//        byte[] bytes=sposTLV.getValue();
-//        int fatherTag=sposTLV.getFatherTag();
-//
-//        List<SposTLV> tlvs=bytes2SposTLVs(bytes);
-//        for (SposTLV tlv:tlvs){
-//           tlv.setFatherTag(fatherTag);
-//        }
-//        return tlvs;
-//    }
 
     /**
      * 递归处理 原始 sposTLV 对象，转为flatTLVs
      * sposTLV.isConstructed() 为判断依据
      *
-     * @param sposTLV  入参
+     * @param tlv      入参
      * @param flatTLVs 出参
      */
-    private static void sposTLV2FlatTLVs(SposTLV sposTLV, List<SposTLV> flatTLVs) {
-        if (sposTLV == null) {
+    private static void sposTLV2FlatTLVs(TLV tlv, List<TLV> flatTLVs) {
+        if (tlv == null) {
             return;
         }
-        if (!sposTLV.isConstructed()) {
+        if (!tlv.isConstructed()) {
             return;
         }
-        byte[] bytes = sposTLV.getValue();
-        int fatherTag = sposTLV.getTag();
+        byte[] bytes = tlv.getValue();
+        int fatherTag = tlv.getTag();
 
-        List<SposTLV> tlvs = bytes2SposTLVs(bytes);
+        List<TLV> tlvs = bytes2SposTLVs(bytes);
         if (tlvs == null || tlvs.size() < 1) {
             return;
         }
-        for (SposTLV tlv : tlvs) {
+        for (TLV tlv2 : tlvs) {
             tlv.setFatherTag(fatherTag);
-            flatTLVs.add(tlv);
-            if (tlv.isConstructed()) {
+            flatTLVs.add(tlv2);
+            if (tlv2.isConstructed()) {
                 //todo 递归未测试
-                sposTLV2FlatTLVs(tlv, flatTLVs);
+                sposTLV2FlatTLVs(tlv2, flatTLVs);
             }
         }
     }
@@ -348,16 +258,16 @@ public class SposTLVUtils {
     /**
      * 处理原始 sposTLVs ，转为flatTLVs
      *
-     * @param sposTLVs
+     * @param TLVs
      * @return flatTLVs
      */
-    public static List<SposTLV> sposTLVs2FlatTLVs(List<SposTLV> sposTLVs) {
-        if (sposTLVs == null || sposTLVs.size() < 1) {
+    public static List<TLV> sposTLVs2FlatTLVs(List<TLV> TLVs) {
+        if (TLVs == null || TLVs.size() < 1) {
             return null;
         }
-        List<SposTLV> items = new ArrayList<SposTLV>();
-        for (SposTLV tlv : sposTLVs) {
-            List<SposTLV> tmp2 = new ArrayList<SposTLV>();
+        List<TLV> items = new ArrayList<TLV>();
+        for (TLV tlv : TLVs) {
+            List<TLV> tmp2 = new ArrayList<TLV>();
             sposTLV2FlatTLVs(tlv, tmp2);
             if (!tmp2.isEmpty()) {
                 items.addAll(tmp2);
@@ -372,9 +282,9 @@ public class SposTLVUtils {
      * @param bytes
      * @return spostlv list
      */
-    public static List<SposTLV> bytes2FlatTLVs(byte[] bytes) {
+    public static List<TLV> bytes2FlatTLVs(byte[] bytes) {
         //假定第一层 没有fatherTag
-        List<SposTLV> tlvs = bytes2SposTLVs(bytes);
+        List<TLV> tlvs = bytes2SposTLVs(bytes);
         if (tlvs == null) {
             return null;
         }
@@ -385,18 +295,18 @@ public class SposTLVUtils {
      * 查找函数 根据tag int 查找
      *
      * @param tag
-     * @param sposTLVs
+     * @param flatTLVs
      * @return TLVs
      */
-    public static List<SposTLV> findByTag(int tag, List<SposTLV> sposTLVs) {
+    public static List<TLV> findByTag(int tag, List<TLV> flatTLVs) {
         if (!justSpos(tag)) {
             return null;
         }
-        if (sposTLVs == null || sposTLVs.size() < 1) {
+        if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;
         }
-        List<SposTLV> items = new ArrayList<SposTLV>();
-        for (SposTLV tlv : sposTLVs) {
+        List<TLV> items = new ArrayList<TLV>();
+        for (TLV tlv : flatTLVs) {
             if (tag == tlv.getTag()) {
                 items.add(tlv);
             }
@@ -404,7 +314,7 @@ public class SposTLVUtils {
         return items;
     }
 
-    public static SposTLV getTLVNotArray(int tag, List<SposTLV> sposTLVs) {
+    public static TLV getTLVNotArray(int tag, List<TLV> flatTLVs) {
         if (!justSpos(tag)) {
             return null;
         }
@@ -412,11 +322,11 @@ public class SposTLVUtils {
         if (justArray(tag)) {
             return null;
         }
-        if (sposTLVs == null || sposTLVs.size() < 1) {
+        if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;
         }
         //假定 数组里没有重复对象，如果重复，取第一个
-        for (SposTLV tlv : sposTLVs) {
+        for (TLV tlv : flatTLVs) {
             if (tag == tlv.getTag()) {
                 return tlv;
             }
@@ -424,13 +334,12 @@ public class SposTLVUtils {
         return null;
     }
 
-    public static List<SposTLV> getTLVsNotArray(List<SposTLV> sposTLVs) {
-        if (sposTLVs == null || sposTLVs.size() < 1) {
+    public static List<TLV> getTLVsNotArray(List<TLV> flatTLVs) {
+        if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;
         }
-        List<SposTLV> dest = new ArrayList<SposTLV>();
-        //假定 数组里没有重复对象，如果重复，取第一个
-        for (SposTLV tlv : sposTLVs) {
+        List<TLV> dest = new ArrayList<TLV>();
+        for (TLV tlv : flatTLVs) {
             if (!justArray(tlv.getTag()) && justSpos(tlv.getTag())) {
                 dest.add(tlv);
             }
@@ -441,13 +350,13 @@ public class SposTLVUtils {
         return dest;
     }
 
-    private static int[] getTLVIsArrayNums(List<SposTLV> sposTLVs) {
-        if (sposTLVs == null || sposTLVs.size() < 1) {
+    private static int[] getTLVIsArrayNums(List<TLV> flatTLVs) {
+        if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;
         }
 
-        Map<Integer, SposTLV> map = new HashMap<Integer, SposTLV>();
-        for (SposTLV tlv : sposTLVs) {
+        Map<Integer, TLV> map = new HashMap<Integer, TLV>();
+        for (TLV tlv : flatTLVs) {
             if (justArray(tlv.getTag())) {
                 map.put(tlv.getTag(), tlv);
             }
@@ -464,28 +373,79 @@ public class SposTLVUtils {
         return dest;
     }
 
-    public static List<SposTLV> getTLVsIsArray(List<SposTLV> sposTLVs) {
-        int[] tags = getTLVIsArrayNums(sposTLVs);
+    public static List<TLV> getTLVsIsArray(List<TLV> flatTLVs) {
+        int[] tags = getTLVIsArrayNums(flatTLVs);
         if (tags.length < 1) {
             return null;
         }
-        List<SposTLV> dest = new ArrayList<SposTLV>();
+        List<TLV> dest = new ArrayList<TLV>();
         for (int i = 0; i < tags.length; i++) {
-            dest.addAll(getTLVsIsArray(tags[i], sposTLVs));
+            dest.addAll(getTLVsIsArray(tags[i], flatTLVs));
         }
         return dest;
     }
 
-    public static List<SposTLV> getTLVsIsArray(int tag, List<SposTLV> sposTLVs) {
+    public static List<TLV> getTLVsNoFather(List<TLV> flatTLVs) {
+        if (flatTLVs == null || flatTLVs.size() < 1) {
+            return null;
+        }
+        List<TLV> dest = new ArrayList<TLV>();
+        for (TLV tlv : flatTLVs) {
+            if (tlv.getFatherTag() == 0 && justSpos(tlv.getTag())) {
+                dest.add(tlv);
+            }
+        }
+        if (dest.size() < 1) {
+            return null;
+        }
+        return dest;
+    }
+
+    public static List<TLV> getTLVsNotConstructed(List<TLV> flatTLVs) {
+        if (flatTLVs == null || flatTLVs.size() < 1) {
+            return null;
+        }
+        List<TLV> dest = new ArrayList<TLV>();
+        for (TLV tlv : flatTLVs) {
+            if (!justConstructed(tlv.getTag())) {
+                dest.add(tlv);
+            }
+        }
+        if (dest.size() < 1) {
+            return null;
+        }
+        return dest;
+    }
+    private static void sortTLVs(List<TLV> flatTLVs){
+            Collections.sort(flatTLVs, new TLVComparator());
+    }
+    public static List<TLV> getTLVsNotConstructedAndIsArray(List<TLV> flatTLVs) {
+        List<TLV> TLVs = getTLVsNotConstructed(flatTLVs);
+        if (TLVs == null || TLVs.size() < 1) {
+            return null;
+        }
+        List<TLV> dest = new ArrayList<TLV>();
+        for (TLV tlv : TLVs) {
+            if (justArray(tlv.getTag())) {
+                dest.add(tlv);
+            }
+        }
+        if (dest.size() < 1) {
+            return null;
+        }
+        return dest;
+    }
+
+    public static List<TLV> getTLVsIsArray(int tag, List<TLV> flatTLVs) {
         //数组 判断
         if (!justArray(tag)) {
             return null;
         }
-        if (sposTLVs == null || sposTLVs.size() < 1) {
+        if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;
         }
-        List<SposTLV> items = new ArrayList<SposTLV>();
-        for (SposTLV tlv : sposTLVs) {
+        List<TLV> items = new ArrayList<TLV>();
+        for (TLV tlv : flatTLVs) {
             if (tag == tlv.getTag()) {
                 items.add(tlv);
             }
@@ -493,26 +453,85 @@ public class SposTLVUtils {
         return items;
     }
 
-    public static SposTLV getFatherTLV(int tag, List<SposTLV> sposTLVs) {
-        if (!justSpos(tag)) {
+    public static TLV getFatherTLV(int fatherTag, List<TLV> TLVs) {
+        if (!justSpos(fatherTag)) {
             return null;
         }
         //数组 判断
-        if (justArray(tag)) {
+        if (justArray(fatherTag)) {
             return null;
         }
-        if (sposTLVs == null || sposTLVs.size() < 1) {
+        if (TLVs == null || TLVs.size() < 1) {
             return null;
         }
         //假定 数组里没有重复对象，如果重复，取第一个
-        for (SposTLV tlv : sposTLVs) {
-            if (tag == tlv.getFatherTag()) {
+        for (TLV tlv : TLVs) {
+            if (fatherTag == tlv.getTag()) {
                 return tlv;
             }
         }
         return null;
     }
+    //todo maybe remove
+    private static boolean combineNotConstructedArray2Nested (List<TLV> flatTLVs,List<TLV> arrays){
+        if (arrays == null || arrays.size() < 1) {
+            return false;
+        }
+        if (flatTLVs == null || flatTLVs.size() < 1) {
+            return false;
+        }
+       int[] nums=getTLVIsArrayNums(arrays);
+       if (nums==null || nums.length<1){
+           return false;
+       }
+       for (int i=0;i<nums.length;i++){
+        List<TLV> items = new ArrayList<TLV>();
+//           if (nums[i]==arrays)
+           for (TLV tlv:arrays){
+           if (nums[i]==tlv.getTag()){
+               items.add(tlv);
+           }
+           }
+           TLV fatherTLV=getFatherTLV(nums[i],flatTLVs);
+           if (fatherTLV!=null) {
+               fatherTLV.setSubTLVs(items);
+               int pos = flatTLVs.indexOf(fatherTLV);
+               flatTLVs.set(pos, fatherTLV);
+           }
 
+       }
+       return false;
+    }
+
+    private static void AddSubTLVs (TLV srcTLV,TLV destTLV){
+        if (srcTLV==null || destTLV==null) return;
+        int tag,fatherTag;
+        tag=srcTLV.getTag();
+        fatherTag=srcTLV.getFatherTag();
+        if (fatherTag==0){return;}
+                List<TLV> fatherSubTLVs=destTLV.getSubTLVs();
+                if (fatherSubTLVs==null){
+                    fatherSubTLVs = new ArrayList<TLV>();
+                    fatherSubTLVs.add(srcTLV);
+                }else{
+                    if(fatherSubTLVs.contains(srcTLV))return;
+                    fatherSubTLVs.add(srcTLV);
+                }
+
+    }
+    private static void makeflatTLVsNested (List<TLV> nestedTLVs,List<TLV> flatTLVs){
+        if(flatTLVs==null||flatTLVs.size()<1){return ;}
+        if(nestedTLVs==null||nestedTLVs.size()<1){return ;}
+        sortTLVs(flatTLVs);
+        int tag,fatherTag;
+        for(TLV tlv:flatTLVs){
+           tag=tlv.getTag();
+           fatherTag=tlv.getFatherTag();
+           //todo
+        }
+
+        return ;
+    }
     /**
      * bytes2SposTLVS 的多态
      * 字节流转换为 spostlv对象Array, array 包含一个或者多个spostlv对象
@@ -520,7 +539,7 @@ public class SposTLVUtils {
      * @param bytes 字节流
      * @return sposTLV
      */
-    public static List<SposTLV> bytes2SposTLVs(byte[] bytes) {
+    public static List<TLV> bytes2SposTLVs(byte[] bytes) {
         return bytes2SposTLVs(bytes, bytes.length);
     }
 
@@ -551,7 +570,7 @@ public class SposTLVUtils {
      * @param tlv
      * @return byte[]
      */
-    public static byte[] TLV2Bytes(SposTLV tlv) {
+    public static byte[] TLV2Bytes(TLV tlv) {
         if (tlv == null || !justSpos(tlv.getTag())) {
             return null;
         }
@@ -572,5 +591,6 @@ public class SposTLVUtils {
         System.arraycopy(tlv.getValue(), 0, dest, 4 + lenBytes.length, tlv_l);
         return dest;
     }
+
 
 }
