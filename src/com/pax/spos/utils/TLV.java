@@ -199,7 +199,7 @@ public class TLV {
 //                ", fatherTag=" + fatherTag + '\'' +
 //                ", fatherTag_Hex=" + Integer.toHexString(fatherTag) + '\'' +
 //                ", isConstructed=" + isConstructed +
-//                ", isArray=" + isArray +
+//                ", isArray=" + isArray + '\'' +
 //                '}';
 //    }
 

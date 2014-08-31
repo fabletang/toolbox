@@ -246,7 +246,7 @@ public class TLVUtils {
             }
         }
         int bytesLen = bytes.length;
-        int len = bytesLen - start;
+        int len = bytesLen - start-1;
         if (len <= 6) {
             return null;
         }
@@ -256,29 +256,31 @@ public class TLVUtils {
     }
 
     public static List<TLV> bytes2FlatTLVs(byte[] bytes) {
-        bytes = filterSposBytes(bytes);
+//       bytes = filterSposBytes(bytes);
+        System.out.println("bytes2FlatTLVs bytes="+ByteStringHex.bytes2HexStr(bytes));
         if (bytes == null || bytes.length < 6) {
             return null;
         }
         List<TLV> flatTLVs = new ArrayList<TLV>();
         int fatherTag = 0, pos = 0;
-        parseBytes(bytes, flatTLVs, fatherTag, pos);
+        flatTLVs=parseBytes(bytes, flatTLVs, fatherTag, pos);
+//        System.out.println("bytes2FlatTLVs flatTLVS="+flatTLVs.get(0));
         return flatTLVs;
     }
 
-    private static void parseBytes(byte[] bytes, List<TLV> flatTLVs, int fatherTag, int pos) {
+    private static List<TLV> parseBytes(byte[] bytes, List<TLV> flatTLVs, int fatherTag, int pos) {
         if (bytes == null) {
-            return;
+            return null;
         }
         if (pos >= bytes.length) {
-            return;
+            return null;
         }
         //bytes=filterSposBytes(bytes);
         int bytesLen = bytes.length;
         //内容校验
         byte[] bytesTag = new byte[4];
         if (!justSpos(ByteStringHex.bytes2Int(bytesTag))) {
-            return;
+            return flatTLVs;
         }
         int tag;
         int len;
@@ -296,7 +298,7 @@ public class TLVUtils {
                 lenBytes = (bytes[i] & 0x7F);
                 //假定length最多占用5个byte
                 if (lenBytes > 4) {
-                    return;
+                    return flatTLVs;
                 }
                 byte[] lenValue = new byte[lenBytes];
                 len = ByteStringHex.bytes2Int(lenValue);
@@ -325,7 +327,7 @@ public class TLVUtils {
                         fatherTag = tlv.getTag();
                     }
                 }
-                parseBytes(bytes, flatTLVs, fatherTag, pos);
+               flatTLVs.addAll(parseBytes(bytes, flatTLVs, fatherTag, pos));
             } else {
                 fatherTag = 0;
                 tlv.setTag(tag);
@@ -336,7 +338,7 @@ public class TLVUtils {
                 flatTLVs.add(tlv);
             }
         }
-        return;
+        return flatTLVs;
     }
 
     /**
@@ -883,7 +885,7 @@ public class TLVUtils {
         }
 //        tmp.addAll(srcArray);
 //        tmp.addAll(dest);
-        System.out.println("insertBystes2Array front. tmp=" + ByteStringHex.bytes2HexStr(ByteStringHex.ArrayBytes2Bytes(tmp)));
+//        System.out.println("insertBystes2Array front. tmp=" + ByteStringHex.bytes2HexStr(ByteStringHex.ArrayBytes2Bytes(tmp)));
         return tmp;
     }
 
@@ -910,7 +912,7 @@ public class TLVUtils {
         if (tlv.getValue() == null || tlv.isConstructed()) {
 //        if (justConstructed(tlv.getTag())) {
 //            if (tlv.getValue() == null || tlv.getSubTLVs() != null) {
-            sonsLen = 0;
+//            sonsLen = 0;
             byte[] addBytes = noValueTLV2Bytes(tlv, sonsLen);
 //            bytes = insertBytes2Front(addBytes, bytes);
 //            System.out.println("++++ parseTLVs. addBytes =" + ByteStringHex.bytes2HexStr(addBytes));
@@ -938,8 +940,8 @@ public class TLVUtils {
             byte[] addBytes = hasValueTLV2Bytes(tlv);
             bytes = insertBytes2ArrayFront(addBytes, bytes);
 //            dest = insertBytes2ArrayFront(addBytes, bytes);
-            sonsLen += addBytes.length;
             flatTLVs.remove(len - 1);
+            sonsLen += addBytes.length;
 //            sonsLen += 0;
         }
         if (flatTLVs.size() == 0) {
@@ -961,7 +963,7 @@ public class TLVUtils {
      * @param tlv      入参
      * @param flatTLVs 出参
      */
-    private static List<TLV> TLV2FlatTLVs(TLV tlv, List<TLV> flatTLVs) {
+    private static List<TLV> TLV2FlatTLVs2(TLV tlv, List<TLV> flatTLVs) {
         if (tlv == null || tlv.getTag() == 0) {
             return flatTLVs;
         }
@@ -982,7 +984,7 @@ public class TLVUtils {
 
         if (tlv.isConstructed()) {
 
-            flatTLVs=TLV2FlatTLVs(tlv, flatTLVs);
+            flatTLVs=TLV2FlatTLVs2(tlv, flatTLVs);
         }
        //     return flatTLVs;
         int fatherTag = tlv.getTag();
@@ -1002,14 +1004,28 @@ public class TLVUtils {
             if (tlv2.isConstructed()) {
 //                if (tlv2.getSubTLVs()!=null) {
                 //todo 递归未测试
-              flatTLVs=TLV2FlatTLVs(tlv2, flatTLVs);
+              flatTLVs=TLV2FlatTLVs2(tlv2, flatTLVs);
             }
         }
 //        System.out.println("--TLV2FlatTLVs flatTLVs size="+flatTLVs.size());
 //        System.out.println("--TLV2FlatTLVs flatTLVs size="+flatTLVs.get(0));
         if (tlv.isConstructed()) {
 
-            flatTLVs=TLV2FlatTLVs(tlv, flatTLVs);
+            flatTLVs=TLV2FlatTLVs2(tlv, flatTLVs);
+        }
+        return flatTLVs;
+    }
+    private static List<TLV> TLV2FlatTLVs(TLV tlv) {
+
+        List<TLV> flatTLVs=new ArrayList<TLV>();
+        if (tlv == null || tlv.getTag() == 0) {
+            return flatTLVs;
+        }
+        flatTLVs.add(tlv);
+        List<TLV> subTLVs=tlv.getSubTLVs();
+        if (subTLVs==null) return flatTLVs;
+        for (TLV tlv1:subTLVs){
+            flatTLVs.addAll(TLV2FlatTLVs(tlv1));
         }
         return flatTLVs;
     }
@@ -1020,16 +1036,18 @@ public class TLVUtils {
         }
         List<TLV> dest = new ArrayList<TLV>();
         for (TLV tlv : TLVs) {
-            TLV2FlatTLVs(tlv, dest);
+//            TLV2FlatTLVs2(tlv, dest);
+            TLV2FlatTLVs(tlv);
         }
         return dest;
     }
 
     public static byte[] TLV2Bytes(TLV nestedTLV) {
         List<TLV> flatTLVs = new ArrayList<TLV>();
-        flatTLVs = TLV2FlatTLVs(nestedTLV, flatTLVs);
+//        flatTLVs = TLV2FlatTLVs(nestedTLV, flatTLVs);
+        flatTLVs = TLV2FlatTLVs(nestedTLV);
     //    TLV2FlatTLVs(nestedTLV, flatTLVs);
-        System.out.println("--TLV2Bytes flatTLVs size=" + flatTLVs.size());
+//        System.out.println("--TLV2Bytes flatTLVs size=" + flatTLVs.size());
         if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;
         }
