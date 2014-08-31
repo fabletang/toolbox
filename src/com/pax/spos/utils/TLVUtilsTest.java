@@ -91,12 +91,12 @@ public class TLVUtilsTest {
 
         hexStr="E1 01 02 03";
         tag=ByteStringHex.hex8Str2int(hexStr);
-        value=ByteStringHex.hexStr2Bytes("02 01 06");
+        value=ByteStringHex.hexStr2Bytes("02 11 06");
         TLV tlv12=new TLV(tag,value);
 
         hexStr="C1 01 02 03";
         tag=ByteStringHex.hex8Str2int(hexStr);
-        value=ByteStringHex.hexStr2Bytes("02 11 36");
+        value=ByteStringHex.hexStr2Bytes("02 77 76");
         TLV tlv121=new TLV(tag,value);
 
         TLVUtils.addSubTLV(tlv11,tlv1);

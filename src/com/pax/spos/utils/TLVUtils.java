@@ -905,23 +905,9 @@ public class TLVUtils {
             tlv.setValue(null);
         }
 
-        if (tlv.getValue() != null ) {
-//            if (tlv.getValue() != null || !tlv.isConstructed()) {
-//        if (!justConstructed(tlv.getTag())) {
-//            System.out.println("-----parseTLVs. flatTLVs.size =" + flatTLVs.size());
-//            System.out.println("-----parseTLVs. isConstructed =" + tlv.isConstructed());
-            byte[] addBytes = hasValueTLV2Bytes(tlv);
-            bytes = insertBytes2ArrayFront(addBytes, bytes);
-//            dest = insertBytes2ArrayFront(addBytes, bytes);
-            sonsLen += addBytes.length;
-            flatTLVs.remove(len - 1);
-//            sonsLen += 0;
-        }
-        if (flatTLVs.size() == 0) {
-            return bytes;
-        }
+
 //        if (tlv.getFatherTag()==0){
-        if (tlv.getValue() == null) {
+        if (tlv.getValue() == null || tlv.isConstructed()) {
 //        if (justConstructed(tlv.getTag())) {
 //            if (tlv.getValue() == null || tlv.getSubTLVs() != null) {
             sonsLen = 0;
@@ -944,6 +930,20 @@ public class TLVUtils {
                 return bytes;
             }
 //            System.out.println("parseTLVs.10 bytes =" + ByteStringHex.bytes2HexStr(ByteStringHex.ArrayBytes2Bytes(bytes)));
+        }if (tlv.getValue() != null ) {
+//            if (tlv.getValue() != null || !tlv.isConstructed()) {
+//        if (!justConstructed(tlv.getTag())) {
+//            System.out.println("-----parseTLVs. flatTLVs.size =" + flatTLVs.size());
+//            System.out.println("-----parseTLVs. isConstructed =" + tlv.isConstructed());
+            byte[] addBytes = hasValueTLV2Bytes(tlv);
+            bytes = insertBytes2ArrayFront(addBytes, bytes);
+//            dest = insertBytes2ArrayFront(addBytes, bytes);
+            sonsLen += addBytes.length;
+            flatTLVs.remove(len - 1);
+//            sonsLen += 0;
+        }
+        if (flatTLVs.size() == 0) {
+            return bytes;
         }
         if (flatTLVs.size() > 0) {
             bytes = parseTLVs(flatTLVs, bytes, sonsLen);
@@ -974,11 +974,16 @@ public class TLVUtils {
 //        if (tlv.getFatherTag() == 0) {
 //       if (tlv.getSubTLVs() == null) {
 //       }
-            tlv = processTag(tlv);
-//            if (!flatTLVs.contains(tlv)) {
+            if (!flatTLVs.contains(tlv)) {
+        tlv = processTag(tlv);
                 flatTLVs.add(tlv);
                 System.out.println("TLV2FlatTLVs: tlv="+ ByteStringHex.int2HexStr(tlv.getTag()));
-//            }
+            }
+
+        if (tlv.isConstructed()) {
+
+            flatTLVs=TLV2FlatTLVs(tlv, flatTLVs);
+        }
        //     return flatTLVs;
         int fatherTag = tlv.getTag();
         System.out.println("TLV2FlatTLVs: tag="+ ByteStringHex.int2HexStr(tlv.getTag()));
@@ -995,12 +1000,17 @@ public class TLVUtils {
             }
 //            flatTLVs.add(tlv2);
             if (tlv2.isConstructed()) {
+//                if (tlv2.getSubTLVs()!=null) {
                 //todo 递归未测试
               flatTLVs=TLV2FlatTLVs(tlv2, flatTLVs);
             }
         }
 //        System.out.println("--TLV2FlatTLVs flatTLVs size="+flatTLVs.size());
 //        System.out.println("--TLV2FlatTLVs flatTLVs size="+flatTLVs.get(0));
+        if (tlv.isConstructed()) {
+
+            flatTLVs=TLV2FlatTLVs(tlv, flatTLVs);
+        }
         return flatTLVs;
     }
 
