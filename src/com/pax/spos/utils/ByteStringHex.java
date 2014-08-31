@@ -3,6 +3,8 @@ package com.pax.spos.utils;
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * author: fable tang
@@ -26,7 +28,7 @@ public class ByteStringHex {
     // return (byte) (_b0 ^ _b1);
     // }
     /*
-	 * Table of CRC values for high-order byte
+     * Table of CRC values for high-order byte
 	 */
     private final static short[] auchCRCHi = {0x00, 0xC1, 0x81, 0x40, 0x01,
             0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
@@ -153,6 +155,7 @@ public class ByteStringHex {
         }
         return sb.toString();
     }
+
     /**
      * 把int转换成16进制字符串
      *
@@ -160,60 +163,68 @@ public class ByteStringHex {
      * @return String 16进制字符串 hexString
      */
     public static String int2HexStr(int i) {
-       return Integer.toHexString(i);
+        return Integer.toHexString(i);
     }
 
     /**
      * int 转换为 byte[4]
-      * @param i
+     *
+     * @param i
      * @return
      */
     public static byte[] int2Bytes(int i) {
         byte[] result = new byte[4];
-        result[0] = (byte)((i >> 24) & 0xFF);
-        result[1] = (byte)((i >> 16) & 0xFF);
-        result[2] = (byte)((i >> 8) & 0xFF);
-        result[3] = (byte)(i & 0xFF);
+        result[0] = (byte) ((i >> 24) & 0xFF);
+        result[1] = (byte) ((i >> 16) & 0xFF);
+        result[2] = (byte) ((i >> 8) & 0xFF);
+        result[3] = (byte) (i & 0xFF);
         return result;
     }
+
     /**
      * 无符号int 转换为 byte[n] n= 1-4
+     *
      * @param i int 待转换的int32
      * @return 不定长bytes <=4
      */
     public static byte[] int2BytesN(int i) {
         byte[] result = new byte[4];
-        result[0] = (byte)((i >> 24) & 0xFF);
-        result[1] = (byte)((i >> 16) & 0xFF);
-        result[2] = (byte)((i >> 8) & 0xFF);
-        result[3] = (byte)(i & 0xFF);
-        int j=0;
-        for (;j<4;){
-           if (result[j]==0x00){
-               j+=1;
-           }else{
-               break;
-           }
+        result[0] = (byte) ((i >> 24) & 0xFF);
+        result[1] = (byte) ((i >> 16) & 0xFF);
+        result[2] = (byte) ((i >> 8) & 0xFF);
+        result[3] = (byte) (i & 0xFF);
+        int j = 0;
+        for (; j < 4; ) {
+            if (result[j] == 0x00) {
+                j += 1;
+            } else {
+                break;
+            }
         }
-        if (j==0){return result;}
-        byte[] dest= new byte[4-j];
-        System.arraycopy(result,j,dest,0,4-j);
+        if (j == 0) {
+            return result;
+        }
+        byte[] dest = new byte[4 - j];
+        System.arraycopy(result, j, dest, 0, 4 - j);
         return dest;
     }
 
     /**
      * bytes 数组转int, 数组由高到低排列，数组不能大于4, 如果小于4, 高位补0x00
+     *
      * @param bytes
      * @return int  如果为0, 不一定是正确结果，需要检验bytes
      */
     public static int bytes2Int(byte[] bytes) {
-        int len=bytes.length;
-        if (len>4||len<1){return 0;}
-        byte[] bytesTemp=new byte[4];
-        if (len<4){
-            System.arraycopy(bytes,0,bytesTemp,len-2,len);
-        }else{
-            bytesTemp=bytes;
+        int len = bytes.length;
+        if (len > 4 || len < 1) {
+            return 0;
+        }
+        byte[] bytesTemp = new byte[4];
+        if (len < 4) {
+            System.arraycopy(bytes, 0, bytesTemp, len - 2, len);
+        } else {
+            bytesTemp = bytes;
         }
         int mask = 0xff;
         int temp = 0;
@@ -297,6 +308,7 @@ public class ByteStringHex {
 
     /**
      * BCD码转为10进制串(阿拉伯数据)
+     *
      * @param bytes byte[]
      * @return bcd string  10进制串
      */
@@ -313,8 +325,9 @@ public class ByteStringHex {
 
     /**
      * 10进制串转为BCD码
+     *
      * @param asc 10进制串
-     * @return  BCD码 byte[]
+     * @return BCD码 byte[]
      */
     public static byte[] str2Bcd(String asc) {
         int len = asc.length();
@@ -483,22 +496,23 @@ public class ByteStringHex {
         return dest;
     }
 
-    public static byte[] GBKBytes2UTF8Bytes (byte[] gbkBytes) throws UnsupportedEncodingException {
-       //new String ("a汉字").getBytes() ;
+    public static byte[] GBKBytes2UTF8Bytes(byte[] gbkBytes) throws UnsupportedEncodingException {
+        //new String ("a汉字").getBytes() ;
         //String str=new String(gbkBytes,"ISO-8859-1");
-        String str=new String(gbkBytes,"GBK");
+        String str = new String(gbkBytes, "GBK");
         return str.getBytes("UTF-8");
     }
 
     public static byte[] UTF8Bytes2GBKBytes(byte[] utf8Bytes) throws UnsupportedEncodingException {
         //new String ("a汉字").getBytes() ;
         //String str=new String(utf8Bytes,"ISO-8859-1");
-        String str=new String(utf8Bytes,"UTF-8");
+        String str = new String(utf8Bytes, "UTF-8");
         return str.getBytes("GBK");
     }
 
     /**
      * GBK字节流 转 UTF8字符串
+     *
      * @param gbkBytes gbk字节流
      * @return utf8Str UTF8字符串
      * @throws UnsupportedEncodingException
@@ -506,25 +520,27 @@ public class ByteStringHex {
     public static String GBKBytes2UTF8Str(byte[] gbkBytes) throws UnsupportedEncodingException {
         //new String ("a汉字").getBytes() ;
         //String str=new String(gbkBytes,"ISO-8859-1");
-        String str=new String(gbkBytes,"GBK");
-        return new String(str.getBytes("UTF-8"),"UTF-8");
+        String str = new String(gbkBytes, "GBK");
+        return new String(str.getBytes("UTF-8"), "UTF-8");
     }
+
     public static String UTF8Bytes2GBKStr(byte[] utf8Bytes) throws UnsupportedEncodingException {
         //new String ("a汉字").getBytes() ;
         //String str=new String(utf8Bytes,"ISO-8859-1");
-        String str=new String(utf8Bytes,"UTF-8");
-        return new String (str.getBytes("GBK"),"GBK");
+        String str = new String(utf8Bytes, "UTF-8");
+        return new String(str.getBytes("GBK"), "GBK");
     }
 
-    public static String UTF8Str2GBKStr (String utf8Str) throws UnsupportedEncodingException {
+    public static String UTF8Str2GBKStr(String utf8Str) throws UnsupportedEncodingException {
 //       byte[] utf8Bytes=UTF8Str2GBKBytes(utf8Str);
 //        System.out.println("UTF8Str2GBKStr:utf8Bytes-len:"+utf8Bytes.length);
-        byte[] gbkBytes=UTF8Str2GBKBytes(utf8Str);
-      // return UTF8Bytes2GBKStr(utf8Bytes);
-        return new String(gbkBytes,"GBK");
+        byte[] gbkBytes = UTF8Str2GBKBytes(utf8Str);
+        // return UTF8Bytes2GBKStr(utf8Bytes);
+        return new String(gbkBytes, "GBK");
 
     }
-    public static String GBKStr2UTF8Str (String gbkStr) {
+
+    public static String GBKStr2UTF8Str(String gbkStr) {
         try {
             return new String(GBKStr2UTF8Bytes(gbkStr), "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -534,27 +550,29 @@ public class ByteStringHex {
 
     /**
      * UTF8字符串(java默认编码） 转 GBK字节流
+     *
      * @param utf8Str UTF8字符串(java默认编码）
      * @return gbkBytes  GBK字节流
      * @throws UnsupportedEncodingException
      */
-    public static byte[] UTF8Str2GBKBytes (String utf8Str) throws UnsupportedEncodingException {
+    public static byte[] UTF8Str2GBKBytes(String utf8Str) throws UnsupportedEncodingException {
         //return UTF8Bytes2GBKBytes(utf8Str.getBytes("ISO-8859-1"));
         return UTF8Bytes2GBKBytes(utf8Str.getBytes("UTF-8"));
     }
 
-    public static byte[] GBKStr2UTF8Bytes (String gbkStr) throws UnsupportedEncodingException {
-        byte[] gbkBytes=gbkStr.getBytes("GBK");
+    public static byte[] GBKStr2UTF8Bytes(String gbkStr) throws UnsupportedEncodingException {
+        byte[] gbkBytes = gbkStr.getBytes("GBK");
         //byte[] gbkBytes=gbkStr.getBytes("ISO-8859-1");
         return GBKBytes2UTF8Bytes(gbkBytes);
     }
 
     /**
      * GBK字符串 转 UTF8字节流 , 已经解决中英文混编，奇数汉字问题
+     *
      * @param gbkStr GBK字符串
      * @return utf8bytes UTF8字节流
      */
-    public static byte[] GBKStr2UTF8Bytes2 (String gbkStr) {
+    public static byte[] GBKStr2UTF8Bytes2(String gbkStr) {
         int n = gbkStr.length();
         byte[] utfBytes = new byte[3 * n];
         int k = 0;
@@ -574,5 +592,38 @@ public class ByteStringHex {
             return tmp;
         }
         return utfBytes;
+    }
+
+    /**
+     * 八个hex字符串 转 int,空格不计数
+     * @param hexStr 最多8个非空格hex字符
+     * @return int
+     */
+    public static int hex8Str2int (String hexStr){
+        if (hexStr==null){
+            return 0;
+        }
+        byte[] tmp=hexStr2Bytes(hexStr);
+        if (tmp==null || tmp.length>4){
+            return 0;
+        }
+        return bytes2Int(tmp);
+    }
+    public static byte[] ArrayBytes2Bytes(ArrayList<Byte> arrayBytes){
+        if (arrayBytes==null||arrayBytes.size()<1) return null;
+        int len=arrayBytes.size();
+        byte[] result = new byte[len];
+        for(int i = 0; i < len; i++) {
+            result[i] = arrayBytes.get(i);
+        }
+        return result;
+    }
+    public static ArrayList<Byte> Bytes2ArrayBytes (byte[] bytes){
+        if(bytes==null || bytes.length<1){return null;}
+        ArrayList<Byte> dest=new ArrayList<Byte>();
+        for(byte b : bytes) {
+            dest.add(b);
+        }
+        return dest;
     }
 }

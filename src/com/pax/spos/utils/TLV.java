@@ -30,11 +30,17 @@ public class TLV {
     public TLV() {
     }
 
+    public TLV(int tag, byte[] value) {
+        this.tag = tag;
+//        if (value!=null){this.length=value.length;}
+        this.value = value;
+    }
     public TLV(int tag, int length, byte[] value) {
         this.tag = tag;
         this.length = length;
         this.value = value;
     }
+
     public TLV(String clazz, String func, String para, boolean isArray, boolean isConstructed, int tag, int length, byte[] value, String dataType, int fatherTag, List<TLV> subTLVs) {
         this.clazz = clazz;
         this.func = func;
@@ -81,13 +87,14 @@ public class TLV {
         this.para = para;
     }
 
-    public boolean isArray(){
+    public boolean isArray() {
         return isArray;
     }
 
     public void setArray(boolean isArray) {
-        this.isArray=isArray;
+        this.isArray = isArray;
     }
+
     public boolean isConstructed() {
         return isConstructed;
     }
@@ -103,6 +110,7 @@ public class TLV {
     public void setFatherTag(int fatherTag) {
         this.fatherTag = fatherTag;
     }
+
     public int getTag() {
         return tag;
     }
@@ -164,7 +172,7 @@ public class TLV {
         return "SposTLV{" +
                 "isArray=" + isArray +
                 ", isConstructed=" + isConstructed +
-                ", tag_Hex=" + Integer.toHexString(tag) + '\'' +
+                ", tag_Hex=" + Integer.toHexString(tag).toUpperCase() + '\'' +
                 ", tag=" + tag +
                 ", length=" + length +
                 ", value=" + Arrays.toString(value) +
@@ -172,7 +180,7 @@ public class TLV {
                 ", clazz='" + clazz + '\'' +
                 ", func='" + func + '\'' +
                 ", para='" + para + '\'' +
-                ", fatherTag_Hex=" + Integer.toHexString(fatherTag) + '\'' +
+                ", fatherTag_Hex=" + Integer.toHexString(fatherTag).toUpperCase() + '\'' +
                 ", fatherTag=" + fatherTag +
                 ", subTLVs=" + subTLVs +
                 '}';
