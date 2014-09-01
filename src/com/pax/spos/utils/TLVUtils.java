@@ -821,17 +821,11 @@ public class TLVUtils {
     }
 
     public static byte[] noValueTLV2Bytes(TLV tlv, int sonBytesLen) {
-//        if (sonBytesLen < 6) {
-//            return null;
-//        }
-//        System.out.println("~~~ -----noValueTLV2Bytes tlv=" + tlv);
-//        System.out.println("~~~ -----noValueTLV2Bytes sonBytesLen=" + sonBytesLen);
         if (tlv == null) {
 //            if (tlv == null || !justSpos(tlv.getTag()) || !justConstructed(tlv.getTag()) || tlv.getValue() != null) {
             return null;
         }
-
-        byte[] lenBytes = TLVLenth2Bytes(sonBytesLen);
+        byte[] lenBytes = TLVLenth2Bytes(tlv.getLength()+sonBytesLen);
 
         byte[] tagBytes = ByteStringHex.int2Bytes(tlv.getTag());
         int len;
@@ -885,7 +879,7 @@ public class TLVUtils {
         }
 //        tmp.addAll(srcArray);
 //        tmp.addAll(dest);
-//        System.out.println("insertBystes2Array front. tmp=" + ByteStringHex.bytes2HexStr(ByteStringHex.ArrayBytes2Bytes(tmp)));
+        System.out.println("insertBystes2Array front. tmp=" + ByteStringHex.bytes2HexStr(ByteStringHex.ArrayBytes2Bytes(tmp)));
         return tmp;
     }
 
@@ -908,41 +902,68 @@ public class TLVUtils {
         }
 
 
-//        if (tlv.getFatherTag()==0){
-        if (tlv.getValue() == null || tlv.isConstructed()) {
-//        if (justConstructed(tlv.getTag())) {
-//            if (tlv.getValue() == null || tlv.getSubTLVs() != null) {
-//            sonsLen = 0;
+        if (tlv.getValue() == null ||tlv.isConstructed()) {
+            System.out.println ("===============================");
+            if (tlv.isConstructed()){
+            }
+                if(tlv.getValue()==null){
+
+                   sonsLen+=0;
+
+                }else {
+                    sonsLen+=tlv.getValue().length;
+                }
+                TLV fatherTLV=getFatherTLV(tlv.getTag(),flatTLVs);
+                int len2=fatherTLV.getLength()+sonsLen;
+                fatherTLV.setLength(len2);
+                System.out.println("-------len2="+len2);
+                int pos=flatTLVs.indexOf(fatherTLV);
+
+                flatTLVs.set(pos,fatherTLV);
+
             byte[] addBytes = noValueTLV2Bytes(tlv, sonsLen);
-//            bytes = insertBytes2Front(addBytes, bytes);
-//            System.out.println("++++ parseTLVs. addBytes =" + ByteStringHex.bytes2HexStr(addBytes));
-//        System.out.println("parseTLVs. addBytes ="+ ByteStringHex.bytes2HexStr(addBytes));
             flatTLVs.remove(len - 1);
             if (addBytes != null && addBytes.length > 1) {
                 bytes = insertBytes2ArrayFront(addBytes, bytes);
-//                dest = insertBytes2ArrayFront(addBytes, bytes);
-//                 insertBytes2ArrayFront(addBytes, bytes);
-//                sonsLen += addBytes.length;
-//                tlv.setLength(sonsLen);
-//                if (flatTLVs.size() > 0) {
-//                    parseTLVs(flatTLVs, bytes, sonsLen);
-//                }
             }
             if (flatTLVs.size() == 0) {
                 return bytes;
             }
 //            System.out.println("parseTLVs.10 bytes =" + ByteStringHex.bytes2HexStr(ByteStringHex.ArrayBytes2Bytes(bytes)));
-        }if (tlv.getValue() != null ) {
+        }
+        if (tlv.getValue() != null ) {
 //            if (tlv.getValue() != null || !tlv.isConstructed()) {
 //        if (!justConstructed(tlv.getTag())) {
 //            System.out.println("-----parseTLVs. flatTLVs.size =" + flatTLVs.size());
 //            System.out.println("-----parseTLVs. isConstructed =" + tlv.isConstructed());
+            if (tlv.isConstructed()){
+              //  sonsLen+=tlv.getValue().length;
+
+            }
             byte[] addBytes = hasValueTLV2Bytes(tlv);
-            bytes = insertBytes2ArrayFront(addBytes, bytes);
+            if (addBytes != null && addBytes.length > 1) {
+                bytes = insertBytes2ArrayFront(addBytes, bytes);
+            }
 //            dest = insertBytes2ArrayFront(addBytes, bytes);
             flatTLVs.remove(len - 1);
             sonsLen += addBytes.length;
 //            sonsLen += 0;
+            if (tlv.isConstructed()){
+                if(tlv.getValue()==null){
+                    sonsLen+=sonsLen;
+
+                }else {
+                    sonsLen+=tlv.getValue().length;
+                }
+                TLV fatherTLV=getFatherTLV(tlv.getTag(),flatTLVs);
+                int len2=fatherTLV.getLength()+sonsLen;
+                fatherTLV.setLength(len2);
+                System.out.println("-------len2="+len2);
+                int pos=flatTLVs.indexOf(fatherTLV);
+
+                flatTLVs.set(pos,fatherTLV);
+
+            }
         }
         if (flatTLVs.size() == 0) {
             return bytes;

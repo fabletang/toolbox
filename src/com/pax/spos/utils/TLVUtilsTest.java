@@ -93,7 +93,7 @@ public class TLVUtilsTest {
         byte[] value=ByteStringHex.hexStr2Bytes("00 01 05");
         TLV tlv1=new TLV();
         tlv1.setTag(tag);
-        tlv1=TLVUtils.processTag(tlv1.getTag(),tlv1);
+//        tlv1=TLVUtils.processTag(tlv1.getTag(),tlv1);
 
         hexStr="C1 01 01 03";
         tag=ByteStringHex.hex8Str2int(hexStr);
@@ -102,8 +102,10 @@ public class TLVUtilsTest {
 
         hexStr="E1 01 02 03";
         tag=ByteStringHex.hex8Str2int(hexStr);
-        value=ByteStringHex.hexStr2Bytes("02 11 06");
-        TLV tlv12=new TLV(tag,value);
+        //value=ByteStringHex.hexStr2Bytes("02 11 06");
+//        TLV tlv12=new TLV(tag,value);
+        TLV tlv12=new TLV();
+        tlv12.setTag(tag);
 
         hexStr="C1 01 02 03";
         tag=ByteStringHex.hex8Str2int(hexStr);
