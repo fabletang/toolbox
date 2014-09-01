@@ -87,6 +87,13 @@ public class ByteStringHexTest {
     public void testCalculateLRC() throws Exception {
 
     }
+    @Test
+    public void TestHexStrEqualByte() throws Exception {
+        String str="C";
+        byte b=(byte)(0xC);
+        boolean result=ByteStringHex.hexStrEqualByte(str,b);
+        assertEquals(true,result);
+    }
 
     @Test
     public void testInt2BytesN() throws Exception {

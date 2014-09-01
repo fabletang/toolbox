@@ -157,6 +157,29 @@ public class ByteStringHex {
     }
 
     /**
+     *单个字节转为16进制字符串
+     *
+     * @param bit8
+     * @return hexStr
+     */
+    public static String byte2HexStr(byte bit8) {
+        return Integer.toHexString(0xF & bit8).toUpperCase();
+    }
+
+    /**
+     * 比较1个字符串的 16进制表示的byte, 用于TLV的tag处理 比如 "C"==(byte)(0xC)结果为真
+     * 不区分大小写
+     * @param hexStr
+     * @param bit8
+     * @return
+     */
+    public static boolean hexStrEqualByte(String hexStr,byte bit8){
+        if (hexStr==null ||hexStr.length()!=1){
+            return false;
+        }
+        return hexStr.equalsIgnoreCase(byte2HexStr(bit8));
+    }
+    /**
      * 把int转换成16进制字符串
      *
      * @param i int 待转换的int32
