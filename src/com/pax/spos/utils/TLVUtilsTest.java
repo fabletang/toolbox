@@ -11,10 +11,11 @@ public class TLVUtilsTest {
     @Test
     public void testJustConstructed() throws Exception {
 
-        String hexStr="E1 01 00 00";
+        String hexStr="E1010000";
         int tag=ByteStringHex.hex8Str2int(hexStr);
         boolean dest=TLVUtils.justConstructed(tag);
         assertEquals(true,dest);
+//        System.out.println("E1010000 isConstructed:"+TLVUtils.justConstructed(tag));
         hexStr="C1 01 00 02";
         tag=ByteStringHex.hex8Str2int(hexStr);
         dest=TLVUtils.justConstructed(tag);
@@ -52,23 +53,32 @@ public class TLVUtilsTest {
     @Test
     public void testBytes2NestedFlatTLVs() throws Exception {
 
+        String hexStr= "E101000015C101010303010105E101020308C101020303027776";
+        byte[] test =ByteStringHex.hexStr2Bytes(hexStr);
+//        List<TLV> res=TLVUtils.bytes2TopNestedTLVs(test);
+        List<TLV> res=TLVUtils.bytes2NestedFlatTLVs(test);
+//        List<TLV> res=TLVUtils.bytes2FlatTLVs(test);
+        assertEquals(4,res.size());
+        String res3=ByteStringHex.bytes2HexStr(TLVUtils.TLV2Bytes(res.get(2)));
+//        System.out.println("testBytes2NestedFlatTLVs "+res3);
     }
 
     @Test
     public void testBytes2TopNestedTLVs() throws Exception {
-    String hexStr= "E101000000C101010303010105E101020303021106C101020303027776";
+    String hexStr= "E101000015C101010303010105E101020308C101020303027776";
         byte[] test =ByteStringHex.hexStr2Bytes(hexStr);
-//        List<TLV> res=TLVUtils.bytes2TopNestedTLVs(test);
-//        List<TLV> res=TLVUtils.bytes2NestedFlatTLVs(test);
-        List<TLV> res=TLVUtils.bytes2FlatTLVs(test);
-        System.out.println("testBytes2TopNestedTLVs res.size="+res.size());
-        for (TLV tlv:res){
-        System.out.println("testTLV2Bytes tlv="+tlv);
-        }
+        List<TLV> res=TLVUtils.bytes2TopNestedTLVs(test);
+//        List<TLV> res=TLVUtils.bytes2FlatTLVs(test);
+//        List<TLV> res=TLVUtils.bytes2FlatTLVs(test);
+        assertEquals(1,res.size());
+        String res0=ByteStringHex.bytes2HexStr(TLVUtils.TLV2Bytes(res.get(0)));
+        //顺序变了 todo
+        //assertEquals(hexStr,res0);
     }
 
     @Test
     public void testTLV2Bytes() throws Exception {
+//        String  "E101000015C101010303010105E101020310C101020303027776";
         String hexStr="C1 01 02 03";
         int tag=ByteStringHex.hex8Str2int(hexStr);
         byte[] value=ByteStringHex.hexStr2Bytes("00 01 05");
@@ -83,17 +93,12 @@ public class TLVUtilsTest {
         assertEquals((byte)(0x05),res[7]);
         tlv=TLVUtils.processTag(tlv.getTag(),tlv);
 //        System.out.println("testTLV2Bytes tlv="+tlv);
-        System.out.println("===========12 testTLV2Bytes res="+ByteStringHex.bytes2HexStr(res));
-    }
-
-    @Test
-    public void testTLVs2Bytes() throws Exception {
-        String hexStr="E1 01 00 00";
-        int tag=ByteStringHex.hex8Str2int(hexStr);
-        byte[] value=ByteStringHex.hexStr2Bytes("00 01 05");
+       // System.out.println("===========12 testTLV2Bytes res="+ByteStringHex.bytes2HexStr(res));
+         hexStr="E1 01 00 00";
+         tag=ByteStringHex.hex8Str2int(hexStr);
+         value=ByteStringHex.hexStr2Bytes("00 01 05");
         TLV tlv1=new TLV();
         tlv1.setTag(tag);
-//        tlv1=TLVUtils.processTag(tlv1.getTag(),tlv1);
 
         hexStr="C1 01 01 03";
         tag=ByteStringHex.hex8Str2int(hexStr);
@@ -115,12 +120,18 @@ public class TLVUtilsTest {
         TLVUtils.addSubTLV(tlv11,tlv1);
         TLVUtils.addSubTLV(tlv121,tlv12);
         TLVUtils.addSubTLV(tlv12,tlv1);
-        System.out.println("11 testTLV2Bytes tlv="+tlv1);
+//        System.out.println("11 testTLV2Bytes tlv="+tlv1);
 
-        byte[] res=TLVUtils.TLV2Bytes(tlv1);
+         res=TLVUtils.TLV2Bytes(tlv1);
         assertEquals((byte)(0xE1),res[0]);
         assertEquals((byte)(0x76),res[res.length-1]);
+        assertEquals((byte)(0x15),res[4]);
+        assertEquals((byte)(0x08),res[17]);
+//        System.out.println("===========13 testTLV2Bytes res="+ByteStringHex.bytes2HexStr(res));
+    }
 
-        System.out.println("===========13 testTLV2Bytes res="+ByteStringHex.bytes2HexStr(res));
+    @Test
+    public void testTLVs2Bytes() throws Exception {
+
     }
 }
