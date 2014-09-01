@@ -47,6 +47,14 @@ public class TLVUtilsTest {
 
     @Test
     public void testFindByTag() throws Exception {
+        String hexStr= "E101000015C101010303010105E101020308C101020303027776";
+        byte[] test =ByteStringHex.hexStr2Bytes(hexStr);
+//        List<TLV> res=TLVUtils.bytes2TopNestedTLVs(test);
+        List<TLV> res=TLVUtils.bytes2NestedFlatTLVs(test);
+//        List<TLV> res=TLVUtils.bytes2FlatTLVs(test);
+        assertEquals(4,res.size());
+        List<TLV> tlvs=TLVUtils.findByTag(0xE1010203,res);
+       assertEquals(8,tlvs.get(0).getLength());
 
     }
 
