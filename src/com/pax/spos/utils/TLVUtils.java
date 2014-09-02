@@ -150,7 +150,8 @@ public class TLVUtils {
         //GBK(汉字编码),0x05 表示Z(BCD扩展 字母/=,备用)
         tlv.setDataType(justDataType(byteTag[3]));
         // 调用 sortutils 处理
-        tlv = SortUtils.SortTag(tag, tlv);
+//        tlv = ClazzUtils.SortTag(tag, tlv);
+        tlv = ClazzUtils.ClazzTag(tag, tlv);
         return tlv;
     }
 

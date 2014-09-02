@@ -4,7 +4,6 @@ import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * author: fable tang
@@ -157,27 +156,73 @@ public class ByteStringHex {
     }
 
     /**
-     *单个字节转为16进制字符串
+     *单个字节转为16进制字符串 自动补0
      *
      * @param bit8
      * @return hexStr
      */
     public static String byte2HexStr(byte bit8) {
-        return Integer.toHexString(0xF & bit8).toUpperCase();
+       String str= Integer.toHexString(0xFF & bit8).toUpperCase();
+        if(str.length()==1){
+            str="0"+str;
+        }
+        return str;
     }
 
     /**
-     * 比较1个字符串的 16进制表示的byte, 用于TLV的tag处理 比如 "C"==(byte)(0xC)结果为真
+     * byte的 高四位 转 string 大写
+     * @param hiBit4
+     * @return
+     */
+    public static String hi4Bit2HexStr(byte hiBit4) {
+        return Integer.toHexString(0x0F & hiBit4>>4).toUpperCase();
+    }
+    /**
+     * byte的 低四位 转 str 大写
+     * @param loBit4
+     * @return
+     */
+    public static String lo4Bit2HexStr(byte loBit4) {
+        return Integer.toHexString(0x0F & loBit4).toUpperCase();
+    }
+    /**
+     * 比较2个字符串的 16进制表示的byte, 用于TLV的tag处理 比如 "1C"==(byte)(0x1C)结果为真
      * 不区分大小写
      * @param hexStr
      * @param bit8
      * @return
      */
     public static boolean hexStrEqualByte(String hexStr,byte bit8){
-        if (hexStr==null ||hexStr.length()!=1){
+        if (hexStr==null ||hexStr.length()!=2){
             return false;
         }
         return hexStr.equalsIgnoreCase(byte2HexStr(bit8));
+    }
+
+    /**
+     * 1个字符串 比较 byte的 高4位
+      * @param hexStr
+     * @param  hiBit4 byte
+     * @return
+     */
+    public static boolean hexStrEqualHi4bit(String hexStr,byte hiBit4){
+        if (hexStr==null ||hexStr.length()!=1){
+            return false;
+        }
+        return hexStr.equalsIgnoreCase(hi4Bit2HexStr(hiBit4));
+    }
+
+    /**
+     * 1个字符串 比较 byte的 低4位
+     * @param hexStr
+     * @param loBit4
+     * @return
+     */
+    public static boolean hexStrEqualLo4bit(String hexStr,byte loBit4){
+        if (hexStr==null ||hexStr.length()!=1){
+            return false;
+        }
+        return hexStr.equalsIgnoreCase(lo4Bit2HexStr(loBit4));
     }
     /**
      * 把int转换成16进制字符串

@@ -1,0 +1,90 @@
+{
+    "model": "tag",
+    "version": "1.0",
+    "clazzs": [
+        {
+            "id": "1",
+            "name": "PED",
+            "funcs": [
+                {
+                    "id": "01",
+                    "name": "PdkPed_GetVer",
+                    "paras": [
+                        {
+                            "id": "01",
+                            "name": "*pszVer"
+                        }
+                    ]
+                },
+                {
+                    "id": "02",
+                    "name": "PdkPed_Init",
+                    "paras": [
+                        {
+                            "id": "01",
+                            "name": "ucType"
+                        }
+                    ]
+                },
+                {
+                    "id": "03",
+                    "name": "PdkPed_WriteMKey",
+                    "paras": [
+                        {
+                            "id": "01",
+                            "name": "ucKeyIdx"
+                        },
+                        {
+                            "id": "02",
+                            "name": "*pszKeyData"
+                        },
+                        {
+                            "id": "03",
+                            "name": "iKeyDataLen"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "name": "CARD",
+            "funcs": [
+                {
+                    "id": "01",
+                    "name": "PdkCard_Read",
+                    "paras": [
+                        {
+                            "id": "01",
+                            "name": "ucEnterMode"
+                        },
+                        {
+                            "id": "02",
+                            "name": "*pucActuralEnter"
+                        },
+                        {
+                            "id": "03",
+                            "name": "stCardInfo"
+                        },
+                        {
+                            "id": "04",
+                            "name": "szTrack1[256]"
+                        },
+                        {
+                            "id": "05",
+                            "name": "szTrack2[256]"
+                        },
+                        {
+                            "id": "06",
+                            "name": "szTrack3[256]"
+                        },
+                        {
+                            "id": "07",
+                            "name": "szSerial[33]"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
