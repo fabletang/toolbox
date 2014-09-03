@@ -134,6 +134,8 @@ public class TLVUtilsTest {
         value=ByteStringHex.hexStr2Bytes("02 01 22");
         TLV tlv122=new TLV(tag,value);
 
+        tlv122=new TLV("C1010303","020122");
+
         TLVUtils.addSubTLV(tlv11,tlv1);
         TLVUtils.addSubTLV(tlv121,tlv12);
         TLVUtils.addSubTLV(tlv122,tlv12);

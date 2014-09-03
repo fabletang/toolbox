@@ -43,6 +43,13 @@ public class TLV {
         this.value = value;
     }
 
+    public TLV(String tagHexStr, String valueHexStr) {
+        if (tagHexStr!=null&&valueHexStr!=null&&tagHexStr.length()!=8&&valueHexStr.length()<6){
+        }else{
+            this.tag = ByteStringHex.hex8Str2int(tagHexStr);
+            this.value = ByteStringHex.hexStr2Bytes(valueHexStr);
+        }
+    }
     public TLV(String clazz, String func, String para, boolean isArray, boolean isConstructed, int tag, int length, byte[] value, String dataType, int fatherTag, List<TLV> subTLVs) {
         this.clazz = clazz;
         this.func = func;
