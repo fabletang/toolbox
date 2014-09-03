@@ -1,5 +1,7 @@
 package com.pax.spos.utils;
 
+import com.pax.spos.utils.model.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 

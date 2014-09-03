@@ -1,9 +1,9 @@
 package com.pax.spos.utils;
 
 import com.google.gson.Gson;
+import com.pax.spos.utils.model.TagJson;
 
 import java.io.*;
-import java.net.URL;
 
 /**
  * Created by fable on 14-9-2.

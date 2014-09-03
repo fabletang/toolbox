@@ -1,4 +1,6 @@
-package com.pax.spos.utils;
+package com.pax.spos.utils.model;
+
+import com.pax.spos.utils.ByteStringHex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -175,7 +177,8 @@ public class TLV {
                 ", tag_Hex=" + Integer.toHexString(tag).toUpperCase() + '\'' +
                 ", tag=" + tag +
                 ", length=" + length +
-                ", value=" + Arrays.toString(value) +
+                ", value=" + ByteStringHex.bytes2HexStr(value) +
+//                ", value=" + Arrays.toString(value) +
                 ", dataType='" + dataType + '\'' +
                 ", clazz='" + clazz + '\'' +
                 ", func='" + func + '\'' +
@@ -185,22 +188,4 @@ public class TLV {
                 ", subTLVs=" + subTLVs +
                 '}';
     }
-//    @Override
-//    public String toString() {
-//        return "SposTLV{" +
-//                "clazz='" + clazz + '\'' +
-//                ", func='" + func + '\'' +
-//                ", para='" + para + '\'' +
-//                ", tag=" + tag + '\'' +
-//                ", tag_Hex=" + Integer.toHexString(tag) + '\'' +
-//                ", length=" + length + '\'' +
-//                ", value_Hex=" + ByteStringHex.bytes2HexStr(value) + '\'' +
-//                ", dataType='" + dataType + '\'' +
-//                ", fatherTag=" + fatherTag + '\'' +
-//                ", fatherTag_Hex=" + Integer.toHexString(fatherTag) + '\'' +
-//                ", isConstructed=" + isConstructed +
-//                ", isArray=" + isArray + '\'' +
-//                '}';
-//    }
-
 }

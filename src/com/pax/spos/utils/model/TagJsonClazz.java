@@ -1,4 +1,4 @@
-package com.pax.spos.utils;
+package com.pax.spos.utils.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;

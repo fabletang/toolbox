@@ -1,5 +1,6 @@
 package com.pax.spos.utils;
 
+import com.pax.spos.utils.model.TLV;
 import org.junit.Test;
 
 import java.util.List;
@@ -61,27 +62,28 @@ public class TLVUtilsTest {
     @Test
     public void testBytes2NestedFlatTLVs() throws Exception {
 
-        String hexStr= "E101000015C101010303010105E101020308C101020303027776";
+//        String hexStr= "E101000015C101010303010105E101020308C101020303027776";
+        String hexStr="E10100001DC101010303010105E101020310C101020303027776C101030303020122";
         byte[] test =ByteStringHex.hexStr2Bytes(hexStr);
 //        List<TLV> res=TLVUtils.bytes2TopNestedTLVs(test);
         List<TLV> res=TLVUtils.bytes2NestedFlatTLVs(test);
 //        List<TLV> res=TLVUtils.bytes2FlatTLVs(test);
-        assertEquals(4,res.size());
+        assertEquals(5,res.size());
         String res3=ByteStringHex.bytes2HexStr(TLVUtils.TLV2Bytes(res.get(2)));
 //        System.out.println("testBytes2NestedFlatTLVs "+res3);
     }
 
     @Test
     public void testBytes2TopNestedTLVs() throws Exception {
-    String hexStr= "E101000015C101010303010105E101020308C101020303027776";
+//    String hexStr= "E101000015C101010303010105E101020308C101020303027776";
+        String hexStr="E10100001DC101010303010105E101020310C101020303027776C101030303020122";
         byte[] test =ByteStringHex.hexStr2Bytes(hexStr);
         List<TLV> res=TLVUtils.bytes2TopNestedTLVs(test);
 //        List<TLV> res=TLVUtils.bytes2FlatTLVs(test);
 //        List<TLV> res=TLVUtils.bytes2FlatTLVs(test);
         assertEquals(1,res.size());
         String res0=ByteStringHex.bytes2HexStr(TLVUtils.TLV2Bytes(res.get(0)));
-        //顺序变了 todo
-        //assertEquals(hexStr,res0);
+        assertEquals(hexStr,res0);
     }
 
     @Test
@@ -113,29 +115,38 @@ public class TLVUtilsTest {
         value=ByteStringHex.hexStr2Bytes("01 01 05");
         TLV tlv11=new TLV(tag,value);
 
-        hexStr="E1 01 02 03";
+//        hexStr="E1 01 02 03";
+        hexStr="C1 01 02 03";
         tag=ByteStringHex.hex8Str2int(hexStr);
-        //value=ByteStringHex.hexStr2Bytes("02 11 06");
+        value=ByteStringHex.hexStr2Bytes("02 11 06");
 //        TLV tlv12=new TLV(tag,value);
         TLV tlv12=new TLV();
         tlv12.setTag(tag);
+        tlv12.setValue(value);
 
         hexStr="C1 01 02 03";
         tag=ByteStringHex.hex8Str2int(hexStr);
         value=ByteStringHex.hexStr2Bytes("02 77 76");
         TLV tlv121=new TLV(tag,value);
 
+        hexStr="C1 01 03 03";
+        tag=ByteStringHex.hex8Str2int(hexStr);
+        value=ByteStringHex.hexStr2Bytes("02 01 22");
+        TLV tlv122=new TLV(tag,value);
+
         TLVUtils.addSubTLV(tlv11,tlv1);
         TLVUtils.addSubTLV(tlv121,tlv12);
+        TLVUtils.addSubTLV(tlv122,tlv12);
         TLVUtils.addSubTLV(tlv12,tlv1);
 //        System.out.println("11 testTLV2Bytes tlv="+tlv1);
 
          res=TLVUtils.TLV2Bytes(tlv1);
-        assertEquals((byte)(0xE1),res[0]);
-        assertEquals((byte)(0x76),res[res.length-1]);
-        assertEquals((byte)(0x15),res[4]);
-        assertEquals((byte)(0x08),res[17]);
+        //E10100001DC101010303010105E101020310C101020303027776C101030303020122
 //        System.out.println("===========13 testTLV2Bytes res="+ByteStringHex.bytes2HexStr(res));
+        assertEquals((byte)(0xE1),res[0]);
+        assertEquals((byte)(0x22),res[res.length-1]);
+        assertEquals((byte)(0x1D),res[4]);
+        assertEquals((byte)(0x10),res[17]);
     }
 
     @Test

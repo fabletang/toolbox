@@ -1,4 +1,4 @@
-package com.pax.spos.utils;
+package com.pax.spos.utils.model;
 
 /**
  * author: fable tang

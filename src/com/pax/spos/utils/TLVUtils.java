@@ -1,5 +1,8 @@
 package com.pax.spos.utils;
 
+import com.pax.spos.utils.model.TLV;
+import com.pax.spos.utils.model.TLVComparator;
+
 import java.util.*;
 
 /**
@@ -112,8 +115,9 @@ public class TLVUtils {
             case ((byte) (0x5)): {
                 return ("Z");
             }
+            //默认  hex
             default:
-                return null;
+                return "B";
         }
     }
 
@@ -240,14 +244,14 @@ public class TLVUtils {
         int pos = 0;
         for (int i = 0; i < bytes.length; i++) {
             if (bytes[i] == 0x00 || (bytes[i] & 0xFF) == 0xFF) {
-               pos=i;
+                pos = i;
                 //continue;
             } else {
                 break;
             }
         }
         int bytesLen = bytes.length;
-        int len = bytesLen -pos ;
+        int len = bytesLen - pos;
         if (len <= 6) {
             return null;
         }
@@ -304,7 +308,7 @@ public class TLVUtils {
             len = bytes[pos];
         }
         byte[] value = new byte[len];
-        System.arraycopy(bytes, pos, value, 0, len);
+        System.arraycopy(bytes, pos + 1, value, 0, len);
         pos += lenBytes;
 //            pos = i;
         tlv.setValue(value);
@@ -319,12 +323,12 @@ public class TLVUtils {
 //        System.out.println("---pos="+pos);
         //todo
         if (tlv.isConstructed()) {
-                flatTLVs.add(tlv);
-                fatherTag = tlv.getTag();
+            flatTLVs.add(tlv);
+            fatherTag = tlv.getTag();
 //            System.out.println("======parse tlv.tag:" + tag);
         } else {
             flatTLVs.add(tlv);
-            pos+=tlv.getValue().length;
+            pos += tlv.getValue().length;
         }
         if (bytesLen - pos >= 6) {
 //            System.out.println("---parse Bytes:" + flatTLVs);
@@ -649,17 +653,6 @@ public class TLVUtils {
 
     public static void addSubTLV(TLV srcTLV, TLV destTLV) {
         if (srcTLV == null || destTLV == null) return;
-        int tag, fatherTag;
-//        tag = srcTLV.getTag();
-        fatherTag = srcTLV.getFatherTag();
-//        if (srcTLV.getValue()==null || srcTLV.getValue().length<1){
-//            srcTLV.setValue(TLVWithTagAndValue2Bytes(srcTLV));
-//        }
-        if (fatherTag == 0) {
-//            return destTLV;
-        }
-        //todo
-        //if (fatherTag!=destTLV.getTag()){return;}
 
         List<TLV> fatherSubTLVs = destTLV.getSubTLVs();
         srcTLV.setFatherTag(destTLV.getTag());
@@ -667,12 +660,23 @@ public class TLVUtils {
             fatherSubTLVs = new ArrayList<TLV>();
             fatherSubTLVs.add(srcTLV);
             destTLV.setSubTLVs(fatherSubTLVs);
-            // destTLV.setConstructed(true);
         } else {
-            if (fatherSubTLVs.contains(srcTLV)) return;
+//            if (fatherSubTLVs.contains(srcTLV)) return;
             fatherSubTLVs.add(srcTLV);
             destTLV.setSubTLVs(fatherSubTLVs);
-            //destTLV.setConstructed(true);
+        }
+//        destTLV.setValue(null);
+        destTLV.setConstructed(true);
+        if (destTLV.getTag() != 0) {
+            byte[] tagBytes = ByteStringHex.int2Bytes(destTLV.getTag());
+            byte hi4bit = (byte) (0xF0 & tagBytes[0]);
+            if (hi4bit == (byte) 0xC0) {
+                tagBytes[0] = (byte) (0x0F & tagBytes[0]);
+                tagBytes[0] = (byte) (0xE0 | tagBytes[0]);
+                destTLV.setTag(ByteStringHex.bytes2Int(tagBytes));
+            }
+
+
         }
 //        return destTLV;
     }
@@ -693,14 +697,14 @@ public class TLVUtils {
         List<TLV> fatherSubTLVs = fatherTLV.getSubTLVs();
         if (fatherSubTLVs == null) {
             fatherSubTLVs = new ArrayList<TLV>();
-            fatherSubTLVs.add(srcTLV);
+            fatherSubTLVs.add(0, srcTLV);
         } else {
             if (fatherSubTLVs.contains(srcTLV)) return destTLVs;
-            fatherSubTLVs.add(srcTLV);
+            fatherSubTLVs.add(0, srcTLV);
         }
         fatherTLV.setSubTLVs(fatherSubTLVs);
-       int index=destTLVs.indexOf(fatherTLV);
-        destTLVs.set(index,fatherTLV);
+        int index = destTLVs.indexOf(fatherTLV);
+        destTLVs.set(index, fatherTLV);
         return destTLVs;
 
     }
@@ -983,15 +987,6 @@ public class TLVUtils {
         if (tlv == null || tlv.getTag() == 0) {
             return flatTLVs;
         }
-//        if (tlv.getSubTLVs() == null && (tlv.getValue() == null || tlv.getValue().length < 1)) {
-//            return;
-//        }
-
-//        tlv = processTag(tlv);
-
-//        if (tlv.getFatherTag() == 0) {
-//       if (tlv.getSubTLVs() == null) {
-//       }
         if (!flatTLVs.contains(tlv)) {
             tlv = processTag(tlv);
             flatTLVs.add(tlv);
@@ -1061,9 +1056,7 @@ public class TLVUtils {
 
     public static byte[] TLV2Bytes(TLV nestedTLV) {
         List<TLV> flatTLVs = new ArrayList<TLV>();
-//        flatTLVs = TLV2FlatTLVs(nestedTLV, flatTLVs);
         flatTLVs = TLV2FlatTLVs(nestedTLV);
-        //    TLV2FlatTLVs(nestedTLV, flatTLVs);
 //        System.out.println("--TLV2Bytes flatTLVs size=" + flatTLVs.size());
         if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;

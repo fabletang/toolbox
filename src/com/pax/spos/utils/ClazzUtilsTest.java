@@ -1,5 +1,7 @@
 package com.pax.spos.utils;
 
+import com.pax.spos.utils.model.TLV;
+import com.pax.spos.utils.model.TagJson;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
