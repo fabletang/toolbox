@@ -1,4 +1,4 @@
-package com.pax.spos.utils;
+package com.pax.spos.utils.tlv;
 
 import org.junit.Test;
 
@@ -87,29 +87,31 @@ public class ByteStringHexTest {
     public void testCalculateLRC() throws Exception {
 
     }
+
     @Test
     public void testHexStrEqualByte() throws Exception {
-        String str="3C";
-        byte b=(byte)(0x3C);
-        boolean result=ByteStringHex.hexStrEqualByte(str,b);
-        assertEquals(true,result);
+        String str = "3C";
+        byte b = (byte) (0x3C);
+        boolean result = ByteStringHex.hexStrEqualByte(str, b);
+        assertEquals(true, result);
     }
 
     @Test
     public void testHexStrEqualHi4bit() throws Exception {
-        String str="3";
-        byte b=(byte)(0x3C);
-        boolean result=ByteStringHex.hexStrEqualHi4bit(str,b);
-        assertEquals(true,result);
+        String str = "3";
+        byte b = (byte) (0x3C);
+        boolean result = ByteStringHex.hexStrEqualHi4bit(str, b);
+        assertEquals(true, result);
     }
 
     @Test
     public void testHexStrEqualLo4bit() throws Exception {
-        String str="C";
-        byte b=(byte)(0x3C);
-        boolean result=ByteStringHex.hexStrEqualLo4bit(str,b);
-        assertEquals(true,result);
+        String str = "C";
+        byte b = (byte) (0x3C);
+        boolean result = ByteStringHex.hexStrEqualLo4bit(str, b);
+        assertEquals(true, result);
     }
+
     @Test
     public void testInt2BytesN() throws Exception {
         int i = 0x3FD;

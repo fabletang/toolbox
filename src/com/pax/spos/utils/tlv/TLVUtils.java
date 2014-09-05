@@ -1,7 +1,7 @@
-package com.pax.spos.utils;
+package com.pax.spos.utils.tlv;
 
-import com.pax.spos.utils.model.TLV;
-import com.pax.spos.utils.model.TLVComparator;
+import com.pax.spos.utils.tlv.model.TLV;
+import com.pax.spos.utils.tlv.model.TLVComparator;
 
 import java.util.*;
 
@@ -172,7 +172,7 @@ public class TLVUtils {
      * @param bytesLen 指定长度 ，bytesLen<=bytes.length
      * @return
      */
-    public static List<TLV> bytes2SposTLVs(byte[] bytes, int bytesLen) {
+    private static List<TLV> bytes2SposTLVs(byte[] bytes, int bytesLen) {
         // 长度校验
         if (bytes == null || bytesLen <= 0 || bytesLen > bytes.length) {
             return null;
@@ -260,7 +260,7 @@ public class TLVUtils {
         return dest;
     }
 
-    public static List<TLV> bytes2FlatTLVs(byte[] bytes) {
+    private static List<TLV> bytes2FlatTLVs(byte[] bytes) {
 //        System.out.println("bytes2FlatTLVs bytes="+ByteStringHex.bytes2HexStr(bytes));
         if (bytes == null || bytes.length < 6) {
             return null;
@@ -420,7 +420,7 @@ public class TLVUtils {
         return items;
     }
 
-    public static List<TLV> flatTLVs2NestedTLVs(List<TLV> flatTLVs) {
+    private static List<TLV> flatTLVs2NestedTLVs(List<TLV> flatTLVs) {
         if (flatTLVs == null) return null;
         List<TLV> dest = new ArrayList<TLV>();
         for (TLV tlv : flatTLVs) {
@@ -430,20 +430,6 @@ public class TLVUtils {
         return dest;
     }
 
-    /**
-     * 多叉树结构的tlvbytes 转为 flatTLV 对象数组
-     *
-     * @param bytes
-     * @return spostlv list 包含多叉树的所有节点，但是subTLVs为空。
-     */
-    public static List<TLV> bytes2FlatTLVs2(byte[] bytes) {
-        //假定第一层 没有fatherTag
-        List<TLV> tlvs = bytes2SposTLVs(bytes);
-        if (tlvs == null) {
-            return null;
-        }
-        return sposTLVs2FlatTLVs(tlvs);
-    }
 
     /**
      * 查找函数 根据tag int 查找
@@ -468,7 +454,7 @@ public class TLVUtils {
         return items;
     }
 
-    public static TLV getTLVNotArray(int tag, List<TLV> flatTLVs) {
+    private static TLV getTLVNotArray(int tag, List<TLV> flatTLVs) {
         if (!justSpos(tag)) {
             return null;
         }
@@ -488,7 +474,7 @@ public class TLVUtils {
         return null;
     }
 
-    public static List<TLV> getTLVsNotArray(List<TLV> flatTLVs) {
+    private static List<TLV> getTLVsNotArray(List<TLV> flatTLVs) {
         if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;
         }
@@ -527,7 +513,7 @@ public class TLVUtils {
         return dest;
     }
 
-    public static List<TLV> getTLVsIsArray(List<TLV> flatTLVs) {
+    private static List<TLV> getTLVsIsArray(List<TLV> flatTLVs) {
         int[] tags = getTLVIsArrayNums(flatTLVs);
         if (tags.length < 1) {
             return null;
@@ -539,7 +525,7 @@ public class TLVUtils {
         return dest;
     }
 
-    public static List<TLV> getTLVsNoFather(List<TLV> flatTLVs) {
+    private static List<TLV> getTLVsNoFather(List<TLV> flatTLVs) {
         if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;
         }
@@ -555,7 +541,7 @@ public class TLVUtils {
         return dest;
     }
 
-    public static List<TLV> getTLVsNotConstructed(List<TLV> flatTLVs) {
+    private static List<TLV> getTLVsNotConstructed(List<TLV> flatTLVs) {
         if (flatTLVs == null || flatTLVs.size() < 1) {
             return null;
         }
@@ -575,7 +561,7 @@ public class TLVUtils {
         Collections.sort(flatTLVs, new TLVComparator());
     }
 
-    public static List<TLV> getTLVsNotConstructedAndIsArray(List<TLV> flatTLVs) {
+    private static List<TLV> getTLVsNotConstructedAndIsArray(List<TLV> flatTLVs) {
         List<TLV> TLVs = getTLVsNotConstructed(flatTLVs);
         if (TLVs == null || TLVs.size() < 1) {
             return null;
@@ -592,7 +578,7 @@ public class TLVUtils {
         return dest;
     }
 
-    public static List<TLV> getTLVsIsArray(int tag, List<TLV> flatTLVs) {
+    private static List<TLV> getTLVsIsArray(int tag, List<TLV> flatTLVs) {
         //数组 判断
         if (!justArray(tag)) {
             return null;
@@ -739,7 +725,7 @@ public class TLVUtils {
      * @param bytes 字节流
      * @return sposTLV
      */
-    public static List<TLV> bytes2SposTLVs(byte[] bytes) {
+    private static List<TLV> bytes2SposTLVs(byte[] bytes) {
         return bytes2SposTLVs(bytes, bytes.length);
     }
 
@@ -803,7 +789,7 @@ public class TLVUtils {
      * @param tlv
      * @return byte[]
      */
-    public static byte[] hasValueTLV2Bytes(TLV tlv) {
+    private static byte[] hasValueTLV2Bytes(TLV tlv) {
 //        if (tlv == null || !justSpos(tlv.getTag()) || tlv.getFatherTag() > 0) {
 //            return null;
 //        }
@@ -826,7 +812,7 @@ public class TLVUtils {
         return dest;
     }
 
-    public static byte[] noValueTLV2Bytes(TLV tlv, int sonBytesLen) {
+    private static byte[] noValueTLV2Bytes(TLV tlv, int sonBytesLen) {
         if (tlv == null) {
 //            if (tlv == null || !justSpos(tlv.getTag()) || !justConstructed(tlv.getTag()) || tlv.getValue() != null) {
             return null;
@@ -890,7 +876,7 @@ public class TLVUtils {
         return tmp;
     }
 
-    public static ArrayList<Byte> parseTLVs(List<TLV> flatTLVs, ArrayList<Byte> bytes, int sonsLen) {
+    private static ArrayList<Byte> parseTLVs(List<TLV> flatTLVs, ArrayList<Byte> bytes, int sonsLen) {
         if (flatTLVs == null || flatTLVs.size() < 1) {
             return bytes;
         }
@@ -1049,7 +1035,7 @@ public class TLVUtils {
         List<TLV> dest = new ArrayList<TLV>();
         for (TLV tlv : TLVs) {
 //            TLV2FlatTLVs2(tlv, dest);
-            TLV2FlatTLVs(tlv);
+            dest.addAll(TLV2FlatTLVs(tlv));
         }
         return dest;
     }
@@ -1076,10 +1062,18 @@ public class TLVUtils {
         }
         List<TLV> flatTLVs = new ArrayList<TLV>();
         flatTLVs = TLVs2FlatTLVs(nestedTLVs);
-        int sonsLen = 0;
+//        System.out.println("---flatTLVs size"+flatTLVs.size());
+//        int sonsLen = 0;
 //        byte[] dest = new byte[0];
+//        ArrayList<Byte> dest = new ArrayList<Byte>();
+//        parseTLVs(flatTLVs, dest, 0);
+//        parseTLVs(flatTLVs, dest, 0);
+//        return ByteStringHex.ArrayBytes2Bytes(dest);
         ArrayList<Byte> dest = new ArrayList<Byte>();
-        parseTLVs(flatTLVs, dest, 0);
+//        byte[] dest = new byte[0];
+        int sonsLen = 0;
+        dest = parseTLVs(flatTLVs, dest, sonsLen);
+//        parseTLVs(flatTLVs, dest, sonsLen);
         return ByteStringHex.ArrayBytes2Bytes(dest);
     }
 

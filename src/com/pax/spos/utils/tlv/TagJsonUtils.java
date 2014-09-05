@@ -1,7 +1,7 @@
-package com.pax.spos.utils;
+package com.pax.spos.utils.tlv;
 
 import com.google.gson.Gson;
-import com.pax.spos.utils.model.TagJson;
+import com.pax.spos.utils.tlv.model.TagJson;
 
 import java.io.*;
 
@@ -12,16 +12,19 @@ import java.io.*;
  */
 public class TagJsonUtils {
     private static TagJsonUtils instance = null;
-    private TagJsonUtils () {
+
+    private TagJsonUtils() {
     }
+
     public static TagJsonUtils getInstance() {
-      if (instance == null) {
-        instance = new TagJsonUtils();
-      }
-      return instance;
+        if (instance == null) {
+            instance = new TagJsonUtils();
+        }
+        return instance;
     }
+
     public TagJson parseJson(String tagjsonPath) throws IOException {
-        if (tagjsonPath==null||tagjsonPath.length()<6||!tagjsonPath.endsWith(".json")){
+        if (tagjsonPath == null || tagjsonPath.length() < 6 || !tagjsonPath.endsWith(".json")) {
             return null;
         }
 //        FileReader file=new FileReader(tagjsonPath);
@@ -30,10 +33,10 @@ public class TagJsonUtils {
 //            file=new FileReader(new InputStreamReader(is).toString());
 //            file=new FileReader(is.toString());
 //        }
-            InputStream is =this.getClass().getResourceAsStream(tagjsonPath);
-        BufferedReader br=new BufferedReader(new InputStreamReader(is));
+        InputStream is = this.getClass().getResourceAsStream(tagjsonPath);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
         Gson gson = new Gson();
-        if (!br.ready())return null;
+        if (!br.ready()) return null;
         return gson.fromJson(br, TagJson.class);
     }
 }

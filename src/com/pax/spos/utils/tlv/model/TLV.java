@@ -1,6 +1,6 @@
-package com.pax.spos.utils.model;
+package com.pax.spos.utils.tlv.model;
 
-import com.pax.spos.utils.ByteStringHex;
+import com.pax.spos.utils.tlv.ByteStringHex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,9 +34,16 @@ public class TLV {
 
     public TLV(int tag, byte[] value) {
         this.tag = tag;
-//        if (value!=null){this.length=value.length;}
         this.value = value;
     }
+
+    public TLV(int tag, byte value) {
+        this.tag = tag;
+        byte[] bs = new byte[1];
+        bs[0] = value;
+        this.value = bs;
+    }
+
     public TLV(int tag, int length, byte[] value) {
         this.tag = tag;
         this.length = length;
@@ -44,12 +51,13 @@ public class TLV {
     }
 
     public TLV(String tagHexStr, String valueHexStr) {
-        if (tagHexStr!=null&&valueHexStr!=null&&tagHexStr.length()!=8&&valueHexStr.length()<6){
-        }else{
+        if (tagHexStr != null && valueHexStr != null && tagHexStr.length() != 8 && valueHexStr.length() < 6) {
+        } else {
             this.tag = ByteStringHex.hex8Str2int(tagHexStr);
             this.value = ByteStringHex.hexStr2Bytes(valueHexStr);
         }
     }
+
     public TLV(String clazz, String func, String para, boolean isArray, boolean isConstructed, int tag, int length, byte[] value, String dataType, int fatherTag, List<TLV> subTLVs) {
         this.clazz = clazz;
         this.func = func;

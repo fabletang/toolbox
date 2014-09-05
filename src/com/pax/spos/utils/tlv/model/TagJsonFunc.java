@@ -1,13 +1,15 @@
-package com.pax.spos.utils.model;
+package com.pax.spos.utils.tlv.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by fable on 14-9-2.
  */
-public class TagJsonPara implements Serializable {
+public class TagJsonFunc implements Serializable {
     String id;
     String name;
+    ArrayList<TagJsonPara> paras;
 
     public String getId() {
         return id;
@@ -23,5 +25,13 @@ public class TagJsonPara implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ArrayList<TagJsonPara> getParas() {
+        return paras;
+    }
+
+    public void setParas(ArrayList<TagJsonPara> paras) {
+        this.paras = paras;
     }
 }

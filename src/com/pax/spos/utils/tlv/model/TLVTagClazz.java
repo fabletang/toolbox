@@ -1,4 +1,4 @@
-package com.pax.spos.utils.model;
+package com.pax.spos.utils.tlv.model;
 
 /**
  * author: fable tang
@@ -8,7 +8,8 @@ package com.pax.spos.utils.model;
  * Modified Date:
  * JDK version used: 1.7
  * version: 0.9
- */public class TLVTagClazz {
+ */
+public class TLVTagClazz {
     private int tag;
     private String type;
     private boolean isConstructed;
@@ -17,8 +18,10 @@ package com.pax.spos.utils.model;
     private String func;
     private String para;
     private int paraIndex;
-    public TLVTagClazz(){
+
+    public TLVTagClazz() {
     }
+
     public TLVTagClazz(int tag, String type, boolean isConstructed, String clazz, String func, String para, int paraIndex) {
         this.tag = tag;
         this.type = type;

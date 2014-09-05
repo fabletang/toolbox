@@ -1,6 +1,4 @@
-package com.pax.spos.utils.model;
-
-import com.pax.spos.utils.model.TLV;
+package com.pax.spos.utils.tlv.model;
 
 import java.util.Comparator;
 
