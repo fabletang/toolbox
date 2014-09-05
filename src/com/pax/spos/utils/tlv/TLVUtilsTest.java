@@ -3,9 +3,10 @@ package com.pax.spos.utils.tlv;
 import com.pax.spos.utils.tlv.model.TLV;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TLVUtilsTest {
 
@@ -71,6 +72,11 @@ public class TLVUtilsTest {
         assertEquals(5, res.size());
         String res3 = ByteStringHex.bytes2HexStr(TLVUtils.TLV2Bytes(res.get(2)));
 //        System.out.println("testBytes2NestedFlatTLVs "+res3);
+        hexStr="CF 00 00 00 02 A0 01 C1 01 01 03 03 33 2E 31";
+        test=ByteStringHex.hexStr2Bytes(hexStr);
+        res=TLVUtils.bytes2NestedFlatTLVs(test);
+        System.out.println("testBytes2NestedFlatTLVs "+res3);
+
     }
 
     @Test
