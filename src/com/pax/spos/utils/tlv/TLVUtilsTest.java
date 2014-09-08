@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TLVUtilsTest {
 
@@ -57,6 +58,15 @@ public class TLVUtilsTest {
         assertEquals(4, res.size());
         List<TLV> tlvs = TLVUtils.findByTag(0xE1010203, res);
         assertEquals(8, tlvs.get(0).getLength());
+         hexStr = "E10100001DC101010303010105E101020310C101020303027776C101030303020122";
+         test = ByteStringHex.hexStr2Bytes(hexStr);
+        res = TLVUtils.bytes2NestedFlatTLVs(test);
+        tlvs = TLVUtils.findByTag(0xC1010303, res);
+        assertEquals(1, tlvs.size());
+//        System.out.println("tlv ="+tlvs.get(0));
+        tlvs = TLVUtils.findByTag(0xC8010103,res);
+//        assertEquals(0,tlvs.size());
+        assertNull(tlvs);
 
     }
 

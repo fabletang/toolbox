@@ -10,3 +10,4 @@ tmp
 bin																	
 out
 *.out
+.idea/workspace.xml

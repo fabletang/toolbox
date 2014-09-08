@@ -432,7 +432,7 @@ public class TLVUtils {
 
 
     /**
-     * 查找函数 根据tag int 查找
+     * 查找函数 根据tag int 查找, 无匹配返回null
      *
      * @param tag
      * @param flatTLVs
@@ -451,6 +451,7 @@ public class TLVUtils {
                 items.add(tlv);
             }
         }
+        if (items.size()==0){return null;}
         return items;
     }
 

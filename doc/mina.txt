@@ -1,0 +1,20 @@
+Mina工具类v1.5
+http://blog.csdn.net/jadyer/article/details/8088068
+
+使用Mina2.x编写同时支持TCP和HTTP的服务端
+http://blog.csdn.net/jadyer/article/details/9306985
+
+HttpClient工具类v1.7
+http://blog.csdn.net/jadyer/article/details/8087960
+
+我的工具类v2.4
+http://blog.csdn.net/jadyer/article/details/7960811
+
+使用 mina 传输大字节数组
+http://blog.csdn.net/yang3wei/article/details/9393607
+
+第七章.Java构建入门
+http://pkaq.github.io/gradledoc/docs/userguide/ch07/tutorial_java_projects.html
+
+java自带的log java.util.logging
+http://huangyunbin.iteye.com/blog/1626666
