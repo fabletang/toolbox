@@ -18,3 +18,24 @@ http://pkaq.github.io/gradledoc/docs/userguide/ch07/tutorial_java_projects.html
 
 java自带的log java.util.logging
 http://huangyunbin.iteye.com/blog/1626666
+
+使用HttpClient向HTTPS地址发送POST请求
+http://www.2cto.com/kf/201207/144648.html
+http://hc.apache.org/httpcomponents-client-4.3.x/httpclient/examples/org/apache/http/examples/client/ClientCustomSSL.java
+http://hc.apache.org/httpcomponents-client-4.3.x/httpclient/examples/org/apache/http/examples/client/ClientAuthentication.java
+
+lib download
+http://hc.apache.org/httpcomponents-client-4.3.x/httpclient/dependency-info.html
+maven
+<dependency>
+  <groupId>org.apache.httpcomponents</groupId>
+  <artifactId>httpclient</artifactId>
+  <version>4.3.5</version>
+</dependency>
+
+还可以直接依赖本地jar包，如：
+
+apply plugin: 'java'
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+}
